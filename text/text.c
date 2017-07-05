@@ -1,4 +1,4 @@
-#include "myLib.h"
+#include "../myLib.h"
 #include "text.h"
 #include "fontimage.h"
 

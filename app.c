@@ -1,12 +1,12 @@
 //BOIDS
 //A SEMI-IMMERSIVE 2D EXPERIENCE BY KEVIN BERRY
 
-#include "myLib.h"
-#include "text.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "birds.h"
-#include "majestic_eagle.h"
+#include "myLib.h"
+#include "text/text.h"
+#include "images/birds.h"
+#include "images/majestic_eagle.h"
 #include "food.h"
 
 //menu variables

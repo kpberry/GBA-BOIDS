@@ -1,4 +1,4 @@
-#include "myLib.h"
+//#include "../myLib.h"
 
 //array of shorts to be drawn as a bitmap character representing the player
 const unsigned short playerfont_12x12[8 * 12 * 12] = {

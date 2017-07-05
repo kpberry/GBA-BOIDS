@@ -1,6 +1,6 @@
 //feed the boids, tuppence a bag
 #include "myLib.h"
-#include "foodimage.h"
+#include "images/foodimage.h"
 #include <stdlib.h>
 
 //clears the food from its previous location, then moves it elswehere on the

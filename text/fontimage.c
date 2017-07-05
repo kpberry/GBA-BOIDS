@@ -1,4 +1,4 @@
-#include "myLib.h"
+#include "../myLib.h"
 #include "fontimage.h"
 
 //image of fonts to be drawn with dma

@@ -1,5 +1,5 @@
-#include "myLib.h"
-#include "food.h"
+#include "../myLib.h"
+#include "foodimage.h"
 
 const unsigned short foodimage[8 * 8] = {
     BG_COLOR,BG_COLOR,FOOD_COLOR_1,FOOD_COLOR_1,FOOD_COLOR_1,FOOD_COLOR_1,BG_COLOR,BG_COLOR,

@@ -1,6 +1,5 @@
 //file defining the boid structure
 #include "myLib.h"
-#include "text.h"
 #include <stdlib.h>
 
 int maxSpeed = FIX8(4) / 3;

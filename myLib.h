@@ -1,3 +1,5 @@
+#ifndef MYLIB_H
+    #define MYLIB_H
 //TYPES
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -176,3 +178,5 @@ void waitForVblank();
 
 #define DMA_IRQ (1 << 30)
 #define DMA_ON (1 << 31)
+
+#endif

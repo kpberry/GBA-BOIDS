@@ -1,6 +1,5 @@
 #include "myLib.h"
-#include "birds.h"
-#include "playerfont.h"
+#include "text/playerfont.h"
 #include <stdlib.h>
 
 int playerSpeed = 3;

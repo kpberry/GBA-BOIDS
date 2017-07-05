@@ -11,12 +11,16 @@ PROGNAME = Boids
 
 # The object files you want to compile into your program
 # This should be a space (SPACE!) separated list of .o files
-OFILES = app.o boid.o graphics.o text.o font.o player.o birds.o playerfont.o food.o foodimage.o majestic_eagle.o fontimage.o
+OFILES = app.o boid.o graphics.o player.o food.o 
+OFILES += images/birds.o images/foodimage.o images/majestic_eagle.o
+OFILES += text/fontimage.o text/font.o text/text.o text/playerfont.o
 
 # The header files you have created.
 # This is necessary to determine when to recompile for files.
 # This should be a space (SPACE!) separated list of .h files
-HFILES = myLib.h boid.h graphics.h text.h birds.h majestic_eagle.h playerfont.h food.h fontimage.h foodimage.h
+HFILES = myLib.h boid.h graphics.h food.h  
+HFILES += images/birds.h images/majestic_eagle.h images/foodimage.h
+HFILES += text/fontimage.h text/font.h text/text.h text/playerfont.h
 
 ################################################################################
 # These are various settings used to make the GBA toolchain work
@@ -72,6 +76,8 @@ crt0.o : $(ARMLIB)/crt0.s
 clean :
 	@echo "[CLEAN] Removing all compiled files"
 	@rm -f *.o *.elf *.gba *.d
+	@rm -f images/*.o images/*.d
+	@rm -f text/*.o text/*.d
 
 vba : CFLAGS += $(CRELEASE)
 vba : $(PROGNAME).gba
