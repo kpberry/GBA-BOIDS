@@ -4,8 +4,8 @@
 #include "myLib.h"
 #include <stdlib.h>
 
-int maxSpeed = FIX8(2);
-int numBoids = 20;
+int maxSpeed = FIX8(3);
+int numBoids = 40;
 int cohesion = FIX8(1) / 12;
 int sync = FIX8(1) / 4;
 int repulsion = FIX8(1) / 8;
@@ -19,6 +19,7 @@ int viewRadius = FIX8(50);
 int distSqr(BOID* a, BOID* b) {
     return SQR(a->x - b->x) + SQR(a->y - b->y);
 }
+
 
 //cohesion rule; move the boid toward the center of mass of all of its neighbors
 void rule1(BOID* cur, BOID* others, int* neighbors) {
@@ -151,8 +152,8 @@ void rule3(BOID* cur, BOID* others, int* neighbors) {
 //find food rule; make the boid move toward the food if the food is withing 4
 //times the viewing radius
 void rule4(BOID* cur, FOOD* food) {
-    if (SQR(cur->x - FIX8(food->x)) < SQR(viewRadius * 2)
-        && SQR(cur->y - FIX8(food->y)) < SQR(viewRadius * 2)) {
+    if (SQR(cur->x - FIX8(food->x)) < SQR(viewRadius << 1)
+        && SQR(cur->y - FIX8(food->y)) < SQR(viewRadius << 1)) {
         cur->vx += UNFIX8((FIX8(food->x) - cur->x) * cohesion);
         cur->vy += UNFIX8((FIX8(food->y) - cur->y) * cohesion);
     }
@@ -163,105 +164,91 @@ void rule4(BOID* cur, FOOD* food) {
 void rule5(BOID* cur, PLAYER* player) {
     if (SQR(cur->x - FIX8(player->x)) < SQR(viewRadius)
         && SQR(cur->y - FIX8(player->y)) < SQR(viewRadius)) {
-        cur->vx -= UNFIX8((FIX8(player->x) - cur->x) * (repulsion >> 3));
-        cur->vy -= UNFIX8((FIX8(player->y) - cur->y) * (repulsion >> 3));
+        cur->vx -= UNFIX8((FIX8(player->x) - cur->x) * (repulsion >> 2));
+        cur->vy -= UNFIX8((FIX8(player->y) - cur->y) * (repulsion >> 2));
     }
-}
-
-int** getBoidAdjacencies(BOID* boids) {
-    int** adjacent = calloc(sizeof(BOID*), numBoids);
-    for (int i = 0; i < numBoids; i++) {
-        adjacent[i] = calloc(sizeof(BOID), numBoids);
-        for (int j = 0; j < numBoids; j++) {
-            if (distSqr(boids + i, boids + j) < SQR(viewRadius)) {
-                adjacent[i][j] = 1;
-            }
-        }
-    }
-    return adjacent;
 }
 
 //calculates the new location of each living boid based on the results of each
 //of the boid rules, then updates all of their positions simultaneously
 void moveAllBoids(BOID* boids, PLAYER* player, FOOD* food) {
     //calculates new locations for all living boids
-    int** neighbors = getBoidAdjacencies(boids);
+    int neighbors[numBoids * numBoids];
     for (int i = 0; i < numBoids; i++) {
-        if (boids[i].isAlive) {
-            //applyBoidRules(boids + i, boids, player, food);
-            //apply the cohesion, repulsion, synchronization, food attraction, and
-            //player repulsion rules to the current boid
-            BOID* cur = boids + i;
-            rule1(cur, boids, neighbors[i]);
-            rule2(cur, boids, neighbors[i]);
-            rule3(cur, boids, neighbors[i]);
-            rule4(cur, food);
-            rule5(cur, player);
-            //release the memory for the neighbors array, since it is no longer needed
+        for (int j = 0; j < numBoids; j++) {
+            if (SQR_DIST(boids + i, boids + j) < SQR(viewRadius) && i != j) {
+                neighbors[numBoids * i + j] = 1;
+            } else {
+                neighbors[0] = 0;
+            }
         }
     }
     for (int i = 0; i < numBoids; i++) {
-        free(neighbors[i]);
+        if (boids[i].isAlive) {
+            //apply the cohesion, repulsion, synchronization, food attraction, and
+            //player repulsion rules to the current boid
+            BOID* cur = boids + i;
+            rule1(cur, boids, neighbors + i * numBoids);
+            rule2(cur, boids, neighbors + i * numBoids);
+            rule3(cur, boids, neighbors + i * numBoids);
+            rule4(cur, food);
+            rule5(cur, player);
+        }
     }
-    free(neighbors);
 
     //updates each boid's previous position with its current position, then
     //updates its position to the position calculated in the previous loop
     for (int i = 0; i < numBoids; i++) {
         if (boids[i].isAlive) {
-            boids[i].oldx = boids[i].x;
-            boids[i].oldy = boids[i].y;
             moveBoid(boids + i);
         }
     }
 }
 
-//draws a boid centered at its x and y location with a "head" drawin in the
-//direction of the boid's velocity
-void drawBoid(BOID* cur) {
-    drawRect3((UNFIX8(cur->x) - 2), (UNFIX8(cur->y) - 2), 4, 4, cur->color);
-    drawRect3((UNFIX8(cur->x) + UNFIX8(cur->vx * 2) - 1),
-        (UNFIX8(cur->y) + UNFIX8(cur->vy * 2) - 1), 3, 3, cur->color);
-}
-
-//Draws a rectangle that covers the old location of a boid's body and head
-void clearBoid(BOID* cur) {
-    drawRect3((UNFIX8(cur->oldx) - 6), (UNFIX8(cur->oldy) - 6), 12, 12, BG_COLOR);
-}
-
 //Clears all of the boids that are currently alive
 void clearAllBoids(BOID* boids) {
+    static BOID* cur;
     for (int i = 0; i < numBoids; i++) {
-        clearBoid(boids + i);
+        cur = boids + i;
+        drawRect3((UNFIX8(cur->oldx) - 5), (UNFIX8(cur->oldy) - 5), 18, 18, BG_COLOR);
     }
 }
 
 //Draws all of the boids to the screen that are currently alive
 void drawAllBoids(BOID* boids) {
+    static BOID* cur;
+    static int x;
+    static int y;
     for (int i = 0; i < numBoids; i++) {
         if (boids[i].isAlive) {
-            drawBoid(boids + i);
+            cur = boids + i;
+            x = UNFIX8(cur->x);
+            y = UNFIX8(cur->y);
+            drawRect3(x - 2, y - 2, 4, 4, cur->color);
+            drawRect3(x + UNFIX8(cur->vx) - 1,
+                    y + UNFIX8(cur->vy) - 1, 3, 3, cur->color);
         }
     }
 }
 
-int _sqrt(int x) {
-    int a = 100;
-    for (int i = 0; i < 3; i++) {
-        a -= (SQR(a) - x) / (a << 1);
-    }
-    return a;
-}
-
 //moves a boid's position by its x and y velocities
 void moveBoid(BOID* cur) {
+    cur->oldx = cur->x;
+    cur->oldy = cur->y;
     //limits a boid's velocity to the maximum velocity value
     int squareSpeed = SQR(cur->vx) + SQR(cur->vy);
 
     if (squareSpeed > SQR(maxSpeed)) {
-        int common = _sqrt(squareSpeed >> 16);
-        cur->vy = cur->vy / common * UNFIX8(maxSpeed);
-        cur->vx = cur->vx / common * UNFIX8(maxSpeed);
+        //These next four lines approximately compute the square root of 
+        //the squared speed with extremely high accuracy
+        int unfixSquareSpeed = squareSpeed >> 16;
+        int guess = 100;
+        for (int i = 0; i < 6; i++) {
+            guess -= (SQR(guess) - unfixSquareSpeed) / (guess << 1);
+        }
+      
+        cur->vy = cur->vy / guess * UNFIX8(maxSpeed);
+        cur->vx = cur->vx / guess * UNFIX8(maxSpeed);
     }
 
     //adds the boid's x and y velocities to its x and y coordinates

@@ -62,6 +62,7 @@ extern int boidsEaten;
 
 //BOID DEFINES
 #define SQR(a) ((a) * (a))
+#define SQR_DIST(a, b) (SQR((a)->x - (b)->x) + SQR((a)->y - (b)->y))
 
 extern int maxSpeed;
 extern int numBoids;
@@ -79,10 +80,6 @@ void rule2(BOID* cur, BOID* others, int* neighbors);
 void rule3(BOID* cur, BOID* others, int* neighbors);
 void rule4(BOID* cur, FOOD* food);
 void rule5(BOID* cur, PLAYER* player);
-int distSqr(BOID*, BOID*);
-void drawBoid(BOID*);
-void drawBoid2d(BOID*);
-void clearBoid(BOID*);
 
 
 //PLAYER DEFINES
