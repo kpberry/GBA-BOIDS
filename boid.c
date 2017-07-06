@@ -1,9 +1,12 @@
 //file defining the boid structure
+#include <stdio.h>
+#include "text/text.h"
 #include "myLib.h"
+#include "approx_sqrts.h"
 #include <stdlib.h>
 
-int maxSpeed = FIX8(4) / 3;
-int numBoids = 16;
+int maxSpeed = FIX8(4) / 2;
+int numBoids = 30;
 int cohesion = 12;
 int sync = 3;
 int repulsion = 4;
@@ -22,6 +25,7 @@ void applyBoidRules(BOID* cur, BOID others[], PLAYER player, FOOD food) {
     rule1(cur, others, neighbors);
     rule2(cur, others, neighbors);
     rule3(cur, others, neighbors);
+    food = food;
     rule4(cur, food);
     rule5(cur, player);
     //release the memory for the neighbors array, since it is no longer needed
@@ -201,37 +205,6 @@ void rule5(BOID* cur, PLAYER player) {
     }
 }
 
-//moves a boid's position by its x and y velocities
-void moveBoid(BOID* cur) {
-    //limits a boid's velocity to the maximum velocity value
-    if (cur->vx > maxSpeed) {
-        cur->vx = maxSpeed;
-    } else if (cur->vx < -maxSpeed) {
-        cur->vx = -maxSpeed;
-    }
-    if (cur->vy > maxSpeed) {
-        cur->vy = maxSpeed;
-    } else if (cur->vy < -maxSpeed) {
-        cur->vy = -maxSpeed;
-    }
-
-    //adds the boid's x and y velocities to its x and y coordinates
-    cur->x += cur->vx;
-    cur->y += cur->vy;
-
-    //wraps a boid around to the other side of the screen if it reaches an edge
-    if (cur->x < 0) {
-        cur->x = FIX8(240);
-    } else if (cur->x > FIX8(240)) {
-        cur->x = 0;
-    }
-    if (cur->y < 0) {
-        cur->y = FIX8(160);
-    } else if (cur->y > FIX8(160)) {
-        cur->y = 0;
-    }
-}
-
 //calculates the new location of each living boid based on the results of each
 //of the boid rules, then updates all of their positions simultaneously
 void moveAllBoids(BOID boids[], PLAYER player, FOOD food) {
@@ -281,3 +254,41 @@ void drawAllBoids(BOID boids[]) {
         }
     }
 }
+
+int _sqrt(int x) {
+    int a = 100;
+    for (int i = 0; i < 3; i++) {
+        a -= (SQR(a) - x) / (a << 1);
+    }
+    return a;
+}
+
+//moves a boid's position by its x and y velocities
+void moveBoid(BOID* cur) {
+    //limits a boid's velocity to the maximum velocity value
+    int squareSpeed = SQR(cur->vx) + SQR(cur->vy);
+
+    if (squareSpeed > SQR(maxSpeed)) {
+        int common = _sqrt(squareSpeed >> 16);
+        cur->vy = cur->vy / common * UNFIX8(maxSpeed);
+        cur->vx = cur->vx / common * UNFIX8(maxSpeed);
+    }
+
+    //adds the boid's x and y velocities to its x and y coordinates
+    cur->x += cur->vx;
+    cur->y += cur->vy;
+
+    //wraps a boid around to the other side of the screen if it reaches an edge
+    if (cur->x < 0) {
+        cur->x = FIX8(240);
+    } else if (cur->x > FIX8(240)) {
+        cur->x = 0;
+    }
+    if (cur->y < 0) {
+        cur->y = FIX8(160);
+    } else if (cur->y > FIX8(160)) {
+        cur->y = 0;
+    }
+}
+
+

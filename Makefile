@@ -11,14 +11,14 @@ PROGNAME = Boids
 
 # The object files you want to compile into your program
 # This should be a space (SPACE!) separated list of .o files
-OFILES = app.o boid.o graphics.o player.o food.o 
+OFILES = app.o boid.o graphics.o player.o food.o approx_sqrts.o
 OFILES += images/birds.o images/foodimage.o images/majestic_eagle.o
 OFILES += text/fontimage.o text/font.o text/text.o text/playerfont.o
 
 # The header files you have created.
 # This is necessary to determine when to recompile for files.
 # This should be a space (SPACE!) separated list of .h files
-HFILES = myLib.h boid.h graphics.h food.h  
+HFILES = myLib.h boid.h graphics.h food.h approx_sqrts.h
 HFILES += images/birds.h images/majestic_eagle.h images/foodimage.h
 HFILES += text/fontimage.h text/font.h text/text.h text/playerfont.h
 
