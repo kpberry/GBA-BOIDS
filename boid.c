@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "text/text.h"
 #include "myLib.h"
-#include "approx_sqrts.h"
 #include <stdlib.h>
 
 int maxSpeed = FIX8(4) / 2;
