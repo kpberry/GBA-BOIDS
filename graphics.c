@@ -42,7 +42,7 @@ void drawImage3(int x, int y, int width, int height, const u16* image) {
     }
 }
 
-//waits until drawing begins, then waits until drawing ends
+//waits until drawing ends, then waits until drawing begins 
 void waitForVblank() {
     while(SCANLINECOUNTER > 160);
     while(SCANLINECOUNTER < 160);
