@@ -146,10 +146,10 @@ void rule3(BOID* cur, BOID* others, int* neighbors) {
 //find food rule; make the boid move toward the food if the food is withing 4
 //times the viewing radius
 void rule4(BOID* cur, FOOD* food) {
-    if (SQR(cur->x - FIX8(food->x)) < SQR(viewRadius << 1)
-        && SQR(cur->y - FIX8(food->y)) < SQR(viewRadius << 1)) {
-        cur->vx += UNFIX8((FIX8(food->x) - cur->x) * cohesion);
-        cur->vy += UNFIX8((FIX8(food->y) - cur->y) * cohesion);
+    if (SQR(cur->x - FIX8(food->x)) < SQR(viewRadius)
+        && SQR(cur->y - FIX8(food->y)) < SQR(viewRadius)) {
+        cur->vx += UNFIX8((FIX8(food->x) - cur->x) * (cohesion << 2));
+        cur->vy += UNFIX8((FIX8(food->y) - cur->y) * (cohesion << 2));
     }
 }
 
