@@ -363,7 +363,7 @@ state handleState(state curState) {
 
             //moves each bird, checks if they any of them ate the food, then
             //checks if any of them were passed over by the player,
-            moveAllBoids(boids, player, food);
+            moveAllBoids(boids, &player, &food);
             handleFoodCollision(player, boids, &food);
             handleBoidCollision(player, boids);
             //prints the number of food items eaten by the player (P) and the
