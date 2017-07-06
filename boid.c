@@ -6,7 +6,7 @@
 
 int maxSpeed = FIX8(3);
 int numBoids = 30;
-int cohesion = FIX8(1) >> 5;
+int cohesion = FIX8(1) >> 4;
 int sync = FIX8(1) >> 2;
 int repulsion = FIX8(1) >> 3;
 int viewRadius = FIX8(50);
