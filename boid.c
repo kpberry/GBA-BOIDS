@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 int maxSpeed = FIX8(3);
-int numBoids = 40;
+int numBoids = 20;
 int cohesion = FIX8(1) / 12;
 int sync = FIX8(1) / 4;
 int repulsion = FIX8(1) / 8;
@@ -14,12 +14,6 @@ int viewRadius = FIX8(50);
 //NOTE: FIX8 and UNFIX8 convert an int value to and from a fixed point decimal
 //value. This shows up when converting decimal boid coordinates and velocities
 //to integer values for rendering
-
-//calculates the square of the distance between two boids
-int distSqr(BOID* a, BOID* b) {
-    return SQR(a->x - b->x) + SQR(a->y - b->y);
-}
-
 
 //cohesion rule; move the boid toward the center of mass of all of its neighbors
 void rule1(BOID* cur, BOID* others, int* neighbors) {
@@ -210,7 +204,7 @@ void clearAllBoids(BOID* boids) {
     static BOID* cur;
     for (int i = 0; i < numBoids; i++) {
         cur = boids + i;
-        drawRect3((UNFIX8(cur->oldx) - 5), (UNFIX8(cur->oldy) - 5), 18, 18, BG_COLOR);
+        drawRect3((UNFIX8(cur->oldx) - 5), (UNFIX8(cur->oldy) - 5), 10, 10, BG_COLOR);
     }
 }
 
