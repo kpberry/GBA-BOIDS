@@ -70,12 +70,10 @@ extern int sync;
 extern int repulsion;
 extern int viewRadius;
 
-void applyBoidRules(BOID* cur, BOID* others, PLAYER* player, FOOD* food);
 void moveBoid(BOID*);
 void moveAllBoids(BOID* boids, PLAYER* player, FOOD* food);
 void clearAllBoids(BOID* boids);
 void drawAllBoids(BOID* boids);
-int* getNeighbors(BOID* cur, BOID* others);
 void rule1(BOID* cur, BOID* others, int* neighbors);
 void rule2(BOID* cur, BOID* others, int* neighbors);
 void rule3(BOID* cur, BOID* others, int* neighbors);

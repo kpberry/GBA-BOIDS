@@ -4,51 +4,16 @@
 #include "myLib.h"
 #include <stdlib.h>
 
-int maxSpeed = FIX8(4) / 2;
+int maxSpeed = FIX8(2);
 int numBoids = 20;
-int cohesion = 12;
-int sync = 3;
-int repulsion = 4;
+int cohesion = FIX8(1) / 12;
+int sync = FIX8(1) / 4;
+int repulsion = FIX8(1) / 8;
 int viewRadius = FIX8(50);
 
 //NOTE: FIX8 and UNFIX8 convert an int value to and from a fixed point decimal
 //value. This shows up when converting decimal boid coordinates and velocities
 //to integer values for rendering
-
-//calculates the location that a boid needs to move to based on 5 rules
-void applyBoidRules(BOID* cur, BOID* others, PLAYER* player, FOOD* food) {
-    //get all of the neighbors of cur
-    int* neighbors = getNeighbors(cur, others);
-    //apply the cohesion, repulsion, synchronization, food attraction, and
-    //player repulsion rules to the current boid
-    rule1(cur, others, neighbors);
-    rule2(cur, others, neighbors);
-    rule3(cur, others, neighbors);
-    rule4(cur, food);
-    rule5(cur, player);
-    //release the memory for the neighbors array, since it is no longer needed
-    free(neighbors);
-}
-
-//returns an integer array to represent which boids in "others" are neighbors of
-//cur, e.g., if "others" is an array of 3 boids and cur is within viewing range
-//of others[1] and others[2], getNeighbors returns [0, 1, 1]
-int* getNeighbors(BOID* cur, BOID* others) {
-    //dynamically allocate a pointer to an array of the size of potential
-    //neighbors
-    int* neighbors = calloc(sizeof(int), numBoids);
-    //if the square of the distance from cur to another boid is less than the
-    //square of a defined viewing radius and the other boid is not the current
-    //boid, put a 1 at that location in neighbors to indicate that the two
-    //boids are neighbors
-    for (int i = 0; i < numBoids; i++) {
-        if (distSqr(cur, others + i) < SQR(viewRadius) && others + i != cur) {
-            neighbors[i] = 1;
-        }
-    }
-
-    return neighbors;
-}
 
 //calculates the square of the distance between two boids
 int distSqr(BOID* a, BOID* b) {
@@ -89,12 +54,12 @@ void rule1(BOID* cur, BOID* others, int* neighbors) {
     ay -= cur->y;
 
     //reduce the acceleration vector by a defined cohesion constant
-    ax /= cohesion;
-    ay /= cohesion;
+    ax *= cohesion;
+    ay *= cohesion;
 
     //add the acceleration vector to the boid's velocity
-    cur->vx += ax;
-    cur->vy += ay;
+    cur->vx += UNFIX8(ax);
+    cur->vy += UNFIX8(ay);
 }
 
 //repulsion rule; attempt to move the boid to a safe distance from its neighbors
@@ -133,12 +98,12 @@ void rule2(BOID* cur, BOID* others, int* neighbors) {
         }
 
         //scale the temporary repulsion vector by repulsion
-        tx /= repulsion;
-        ty /= repulsion;
+        tx *= repulsion;
+        ty *= repulsion;
 
         //add the temp vector to the total acceleration vector
-        ax -= tx;
-        ay -= ty;
+        ax -= UNFIX8(tx);
+        ay -= UNFIX8(ty);
     }
 
     //add the acceleration vector to the current velocity
@@ -175,21 +140,21 @@ void rule3(BOID* cur, BOID* others, int* neighbors) {
     ay /= neighborCount;
 
     //scale the heading by a constant synchronization value
-    ax /= sync;
-    ay /= sync;
+    ax *= sync;
+    ay *= sync;
 
     //add the acceleration vector to the current boid's velocity
-    cur->vx += ax;
-    cur->vy += ay;
+    cur->vx += UNFIX8(ax);
+    cur->vy += UNFIX8(ay);
 }
 
 //find food rule; make the boid move toward the food if the food is withing 4
 //times the viewing radius
 void rule4(BOID* cur, FOOD* food) {
-    if (SQR(cur->x - FIX8(food->x)) < SQR(viewRadius)
+    if (SQR(cur->x - FIX8(food->x)) < SQR(viewRadius * 2)
         && SQR(cur->y - FIX8(food->y)) < SQR(viewRadius * 2)) {
-        cur->vx += (FIX8(food->x) - cur->x) / cohesion * 2;
-        cur->vy += (FIX8(food->y) - cur->y) / cohesion * 2;
+        cur->vx += UNFIX8((FIX8(food->x) - cur->x) * cohesion);
+        cur->vy += UNFIX8((FIX8(food->y) - cur->y) * cohesion);
     }
 }
 
@@ -198,20 +163,47 @@ void rule4(BOID* cur, FOOD* food) {
 void rule5(BOID* cur, PLAYER* player) {
     if (SQR(cur->x - FIX8(player->x)) < SQR(viewRadius)
         && SQR(cur->y - FIX8(player->y)) < SQR(viewRadius)) {
-        cur->vx -= (FIX8(player->x) - cur->x) / (repulsion * 10);
-        cur->vy -= (FIX8(player->y) - cur->y) / (repulsion * 10);
+        cur->vx -= UNFIX8((FIX8(player->x) - cur->x) * (repulsion >> 3));
+        cur->vy -= UNFIX8((FIX8(player->y) - cur->y) * (repulsion >> 3));
     }
+}
+
+int** getBoidAdjacencies(BOID* boids) {
+    int** adjacent = calloc(sizeof(BOID*), numBoids);
+    for (int i = 0; i < numBoids; i++) {
+        adjacent[i] = calloc(sizeof(BOID), numBoids);
+        for (int j = 0; j < numBoids; j++) {
+            if (distSqr(boids + i, boids + j) < SQR(viewRadius)) {
+                adjacent[i][j] = 1;
+            }
+        }
+    }
+    return adjacent;
 }
 
 //calculates the new location of each living boid based on the results of each
 //of the boid rules, then updates all of their positions simultaneously
 void moveAllBoids(BOID* boids, PLAYER* player, FOOD* food) {
     //calculates new locations for all living boids
+    int** neighbors = getBoidAdjacencies(boids);
     for (int i = 0; i < numBoids; i++) {
         if (boids[i].isAlive) {
-            applyBoidRules(boids + i, boids, player, food);
+            //applyBoidRules(boids + i, boids, player, food);
+            //apply the cohesion, repulsion, synchronization, food attraction, and
+            //player repulsion rules to the current boid
+            BOID* cur = boids + i;
+            rule1(cur, boids, neighbors[i]);
+            rule2(cur, boids, neighbors[i]);
+            rule3(cur, boids, neighbors[i]);
+            rule4(cur, food);
+            rule5(cur, player);
+            //release the memory for the neighbors array, since it is no longer needed
         }
     }
+    for (int i = 0; i < numBoids; i++) {
+        free(neighbors[i]);
+    }
+    free(neighbors);
 
     //updates each boid's previous position with its current position, then
     //updates its position to the position calculated in the previous loop
