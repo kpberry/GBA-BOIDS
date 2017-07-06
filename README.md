@@ -1,6 +1,7 @@
-Author: Kevin Berry
+# BOIDS
 
-Objective:
+## Objective:
+
     Eat food! The large blue dots on the screen are pieces of food; you need to
     eat 30 pieces of food before the Boids (bird-oid objects) can eat 100. You
     may eat Boids by passing over them on your way to the food, but they will
@@ -8,7 +9,8 @@ Objective:
     Good Luck.
 
 
-Controls:
+## Controls:
+
     From Any Context:
         Select:   Return to main menu
 
@@ -26,7 +28,8 @@ Controls:
 
     All other necessary controls are listed on the screen.
 
-Options:
+## Options:
+
     Number of Boids: This changes how many boids can appear at once. This runs
     fine for 0 to 20 boids, but substantially slows down beyond that.
 
