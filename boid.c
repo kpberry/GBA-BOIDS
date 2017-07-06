@@ -237,7 +237,7 @@ void moveBoid(BOID* cur) {
         //the squared speed with extremely high accuracy
         int unfixSquareSpeed = squareSpeed >> 16;
         int guess = 100;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 5; i++) {
             guess -= (SQR(guess) - unfixSquareSpeed) / (guess << 1);
         }
       
