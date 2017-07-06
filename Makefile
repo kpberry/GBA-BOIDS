@@ -11,7 +11,7 @@ PROGNAME = Boids
 
 # The object files you want to compile into your program
 # This should be a space (SPACE!) separated list of .o files
-OFILES = app.o boid.o graphics.o player.o food.o 
+OFILES = game.o boid.o graphics.o player.o food.o 
 OFILES += images/birds.o images/foodimage.o images/majestic_eagle.o
 OFILES += text/fontimage.o text/font.o text/text.o text/playerfont.o
 
