@@ -133,11 +133,11 @@ state handleState(state curState) {
                 if (cursorPosition == 0) {
                     numBoids = (numBoids - 1 + 100) % 100;
                 } else if (cursorPosition == 1) {
-                    cohesion = (cohesion - 1) % 30;
+                    cohesion = (cohesion - 1) % 128;
                 } else if (cursorPosition == 2) {
-                    sync = (sync - 1) % 30;
+                    sync = (sync - 1) % 128;
                 } else if (cursorPosition == 3) {
-                    repulsion = (repulsion - 1) % 30;
+                    repulsion = (repulsion - 1) % 128;
                 } else if (cursorPosition == 4) {
                     playerSpeed = (playerSpeed - 1 + 5) % 5;
                 } else if (cursorPosition == 5) {
@@ -148,11 +148,11 @@ state handleState(state curState) {
                 if (cursorPosition == 0) {
                     numBoids = (numBoids + 1 + 100) % 100;
                 } else if (cursorPosition == 1) {
-                    cohesion = (cohesion + 1) % 30;
+                    cohesion = (cohesion + 1) % 128;
                 } else if (cursorPosition == 2) {
-                    sync = (sync + 1) % 30;
+                    sync = (sync + 1) % 128;
                 } else if (cursorPosition == 3) {
-                    repulsion = (repulsion + 1) % 30;
+                    repulsion = (repulsion + 1) % 128;
                 } else if (cursorPosition == 4) {
                     playerSpeed = (playerSpeed + 1 + 5) % 5;
                 } else if (cursorPosition == 5) {

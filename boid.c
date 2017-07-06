@@ -5,10 +5,10 @@
 #include <stdlib.h>
 
 int maxSpeed = FIX8(3);
-int numBoids = 20;
-int cohesion = FIX8(1) / 12;
-int sync = FIX8(1) / 4;
-int repulsion = FIX8(1) / 8;
+int numBoids = 30;
+int cohesion = FIX8(1) >> 5;
+int sync = FIX8(1) >> 2;
+int repulsion = FIX8(1) >> 3;
 int viewRadius = FIX8(50);
 
 //NOTE: FIX8 and UNFIX8 convert an int value to and from a fixed point decimal
