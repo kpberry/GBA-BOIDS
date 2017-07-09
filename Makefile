@@ -27,66 +27,56 @@ HFILES += text/fontimage.h text/font.h text/text.h text/playerfont.h
 # DO NOT EDIT BELOW.
 ################################################################################
 
-TOOLDIR  = /usr/local/cs2110-tools
-ARMLIB   = $(TOOLDIR)/arm-thumb-eabi/lib
-CFLAGS   = -Wall -Werror -std=c99 -pedantic -Wextra
-CFLAGS   += -mthumb-interwork -mlong-calls -nostartfiles -MMD -MP -I $(TOOLDIR)/include
-LDFLAGS = -L $(TOOLDIR)/lib \
-		  -L $(TOOLDIR)/lib/gcc/arm-thumb-eabi/4.4.1/thumb \
-		  -L $(ARMLIB) \
-		  --script $(ARMLIB)/arm-gba.ld
-CDEBUG   = -g -DDEBUG
-CRELEASE = -O2
-CC       = $(TOOLDIR)/bin/arm-thumb-eabi-gcc
-AS       = $(TOOLDIR)/bin/arm-thumb-eabi-as
-LD       = $(TOOLDIR)/bin/arm-thumb-eabi-ld
-OBJCOPY  = $(TOOLDIR)/bin/arm-thumb-eabi-objcopy
-GDB      = $(TOOLDIR)/bin/arm-thumb-eabi-gdb
-CFILES   = $(OFILES:.o=.c)
-
-################################################################################
-# These are the targets for the GBA build system
-################################################################################
-
-all : CFLAGS += $(CRELEASE)
-all : $(PROGNAME).gba
+.PHONY: all
+all: CFLAGS += $(CRELEASE)
+all: LDFLAGS += $(LDRELEASE)
+all: $(PROGNAME).gba
 	@echo "[FINISH] Created $(PROGNAME).gba"
 
-.PHONY : all clean
+include /opt/cs2110-tools/GBAVariables.mak
+
+debug : CFLAGS += $(CDEBUG)
+debug : LDFLAGS += $(LDDEBUG)
+debug : $(PROGNAME).gba
+	@echo "[FINISH] Created $(PROGNAME).gba"
 
 $(PROGNAME).gba : $(PROGNAME).elf
 	@echo "[LINK] Linking objects together to create $(PROGNAME).gba"
 	@$(OBJCOPY) -O binary $(PROGNAME).elf $(PROGNAME).gba
 
-$(PROGNAME).elf : crt0.o $(OFILES)
-	@$(LD) $(LDFLAGS) -o $(PROGNAME).elf $^ -lgcc -lc -lgcc $(LDDEBUG)
-	@rm -f *.d
-
-crt0.o : $(ARMLIB)/crt0.s
-	@$(AS) -mthumb-interwork $^ -o crt0.o
+$(PROGNAME).elf : crt0.o $(GCCLIB)/crtbegin.o $(GCCLIB)/crtend.o $(GCCLIB)/crti.o $(GCCLIB)/crtn.o $(OFILES) libc_sbrk.o
+	@$(CC) $(CFLAGS) -o $(PROGNAME).elf $^ $(LDFLAGS)
 
 %.o : %.c
 	@echo "[COMPILE] Compiling $<"
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-%.o : %.s
-	@echo "[ASSEMBLE] Assembling $<"
-	@$(AS) $< -o $@ -mthumb -mthumb-interwork
+%.o : %.s                                                                        
+	@echo "[ASSEMBLE] Assembling $<"                                               
+	@$(AS) $(MODEL) $< -o $@
 
-clean :
-	@echo "[CLEAN] Removing all compiled files"
-	@rm -f *.o *.elf *.gba *.d
-	@rm -f images/*.o images/*.d
-	@rm -f text/*.o text/*.d
-
+.PHONY : vba
 vba : CFLAGS += $(CRELEASE)
+vba : LDFLAGS += $(LDRELEASE)
 vba : $(PROGNAME).gba
 	@echo "[EXECUTE] Running Emulator VBA-M"
-	@vbam $(VBAOPT) $(PROGNAME).gba > /dev/null 2> /dev/null
+	@vbam $(VBAOPT) $(PROGNAME).gba
 
+.PHONY : mgba
+mgba : CFLAGS += $(CRELEASE)
+mgba : LDFLAGS += $(LDRELEASE)
+mgba : $(PROGNAME).gba
+	@echo "[EXECUTE] Running Emulator VBA-M"
+	@mgba $(PROGNAME).gba
+
+.PHONY : med
 med : CFLAGS += $(CRELEASE)
+med : LDFLAGS += $(LDRELEASE)
 med : $(PROGNAME).gba
 	@echo "[EXECUTE] Running emulator Mednafen"
-	@mednafen $(PROGNAME).gba > /dev/null 2>&1
+	@mednafen $(PROGNAME).gba
 
--include $(CFILES:%.c=%.d)
+.PHONY : clean
+clean :
+	@echo "[CLEAN] Removing all compiled files"
+	@rm -f *.o *.elf *.gba images/*.o text/*.o
