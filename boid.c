@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 int maxSpeed = FIX8(3);
-int numBoids = 30;
+int numBoids = 20;
 int cohesion = FIX8(1) >> 4;
 int sync = FIX8(1) >> 2;
 int repulsion = FIX8(1) >> 3;

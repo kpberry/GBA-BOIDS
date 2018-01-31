@@ -1,12 +1,15 @@
 # BOIDS
 
 ## Installation:
-### Linux:
-    git clone https://github.com/kpberry/gba-boids.git
+### Ubuntu:
+    sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110
+    sudo apt-get update
     sudo apt-get install gcc-arm-none-eabi
     sudo apt-get install libnewlib-arm-none-eabi
+    sudo apt-get install cs2110-gba-linker-script
     sudo apt-get install cs2110-vbam-sdl
-    make run
+    cd ./gba-boids
+    make vba
 
 ### Windows/Mac:
 	¯\_(ツ)_/¯    
