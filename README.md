@@ -1,5 +1,16 @@
 # BOIDS
 
+## Installation:
+### Linux:
+    git clone https://github.com/kpberry/gba-boids.git
+    sudo apt-get install gcc-arm-none-eabi
+    sudo apt-get install libnewlib-arm-none-eabi
+    sudo apt-get install cs2110-vbam-sdl
+    make run
+
+### Windows/Mac:
+	¯\_(ツ)_/¯    
+
 ## Objective:
 
     Eat food! The large blue dots on the screen are pieces of food; you need to
