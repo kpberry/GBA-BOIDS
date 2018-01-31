@@ -2,6 +2,7 @@
 
 ## Installation:
 ### Ubuntu:
+    git clone https://github.com/kpberry/gba-boids
     sudo add-apt-repository ppa:tricksterguy87/ppa-gt-cs2110
     sudo apt-get update
     sudo apt-get install gcc-arm-none-eabi
