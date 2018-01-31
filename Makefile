@@ -26,21 +26,26 @@ HFILES += text/fontimage.h text/font.h text/text.h text/playerfont.h
 # These are various settings used to make the GBA toolchain work
 # DO NOT EDIT BELOW.
 ################################################################################
-include res/GBAVariables.mak
 
 .PHONY: all
-all : CFLAGS += $(CRELEASE)
+all: CFLAGS += $(CRELEASE)
+all: LDFLAGS += $(LDRELEASE)
 all: $(PROGNAME).gba
+	@echo "[FINISH] Created $(PROGNAME).gba"
+
+include /opt/cs2110-tools/GBAVariables.mak
+
+debug : CFLAGS += $(CDEBUG)
+debug : LDFLAGS += $(LDDEBUG)
+debug : $(PROGNAME).gba
 	@echo "[FINISH] Created $(PROGNAME).gba"
 
 $(PROGNAME).gba : $(PROGNAME).elf
 	@echo "[LINK] Linking objects together to create $(PROGNAME).gba"
 	@$(OBJCOPY) -O binary $(PROGNAME).elf $(PROGNAME).gba
 
-$(PROGNAME).elf : res/crt0.o $(GCCLIB)/crtbegin.o $(GCCLIB)/crtend.o $(GCCLIB)/crti.o $(GCCLIB)/crtn.o $(OFILES)
-	@$(CC) $(LINKFLAGS) -o $(PROGNAME).elf $^ -lgcc -lc $(LDDEBUG)
-	@rm -f *.d
-
+$(PROGNAME).elf : crt0.o $(GCCLIB)/crtbegin.o $(GCCLIB)/crtend.o $(GCCLIB)/crti.o $(GCCLIB)/crtn.o $(OFILES) libc_sbrk.o
+	@$(CC) $(CFLAGS) -o $(PROGNAME).elf $^ $(LDFLAGS)
 
 %.o : %.c
 	@echo "[COMPILE] Compiling $<"
@@ -52,25 +57,26 @@ $(PROGNAME).elf : res/crt0.o $(GCCLIB)/crtbegin.o $(GCCLIB)/crtend.o $(GCCLIB)/c
 
 .PHONY : vba
 vba : CFLAGS += $(CRELEASE)
+vba : LDFLAGS += $(LDRELEASE)
 vba : $(PROGNAME).gba
 	@echo "[EXECUTE] Running Emulator VBA-M"
-	@vbam $(VBAOPT) $(PROGNAME).gba > /dev/null 2> /dev/null
+	@vbam $(VBAOPT) $(PROGNAME).gba
 
 .PHONY : mgba
 mgba : CFLAGS += $(CRELEASE)
+mgba : LDFLAGS += $(LDRELEASE)
 mgba : $(PROGNAME).gba
 	@echo "[EXECUTE] Running Emulator VBA-M"
-	@mgba $(PROGNAME).gba > /dev/null 2> /dev/null
+	@mgba $(PROGNAME).gba
 
 .PHONY : med
 med : CFLAGS += $(CRELEASE)
+med : LDFLAGS += $(LDRELEASE)
 med : $(PROGNAME).gba
 	@echo "[EXECUTE] Running emulator Mednafen"
-	@mednafen $(PROGNAME).gba > /dev/null 2>&1
+	@mednafen $(PROGNAME).gba
 
 .PHONY : clean
 clean :
 	@echo "[CLEAN] Removing all compiled files"
-	@rm -f *.o *.elf *.gba *.d res/*.o res/*.d
-
--include $(CFILES:%.c=%.d)
+	@rm -f *.o *.elf *.gba images/*.o text/*.o
