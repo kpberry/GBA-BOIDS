@@ -7,7 +7,7 @@
     sudo apt-get install libnewlib-arm-none-eabi
     sudo apt-get install cs2110-vbam-sdl
     cd ./gba-boids
-    make run
+    make vba
 
 ### Windows/Mac:
 	¯\_(ツ)_/¯    
